@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -26,12 +26,12 @@ namespace GitSvnWrapper
         public int ReturnCode { get { return rc; } } // The return code of the git execution
         private string PowershellExecutablePath { get; set; }
 
-        public int Execute(string url, string username, string password, string certificateAcceptResponse)
+        public int Execute(string url, string username, string password, string certificateAcceptResponse, string options)
         {
-            return Execute(url, username, password, certificateAcceptResponse, 60);
+            return Execute(url, username, password, certificateAcceptResponse, options, 60);
         }
 
-        public int Execute(string url, string username, string password, string certificateAcceptResponse, int timeoutInSeconds)
+        public int Execute(string url, string username, string password, string certificateAcceptResponse, string options, int timeoutInSeconds)
         {
             var ok = false;
             try
@@ -53,7 +53,7 @@ namespace GitSvnWrapper
                 var commands = new string[]
                 {
                     string.Format("$marker='{0}'", marker),
-                    string.Format("git svn clone {0} --username {1}", url, username),
+                    string.Format("git svn clone {0} --username {1} {2}", url, username, options),
                     "\"$marker#$LASTEXITCODE#\""
                 };
 
@@ -266,7 +266,7 @@ namespace GitSvnWrapper
                 if (currentChar == '{')
                 {
                     if (scanningKeyName) throw new Exception(
-                        "The character '{' is not a valid in a key name. To include the '{' character in your text, escape it with another: {{.");
+                        "The character '{' is not a valid in a key name. To include the '{' character in your text, escape it with another: { {.");
 
                     // If it's escaped, then add it to output.
                     if (index < input.Length - 1 && input[index + 1] == '{')
@@ -286,7 +286,7 @@ namespace GitSvnWrapper
                     {
                         // But not if we're scanning a key name
                         if (scanningKeyName) throw new Exception(
-                            "The character '}' is not a valid in a key name. To include the '}' character in your text, escape it with another: }}.");
+                            "The character '}' is not a valid in a key name. To include the '}' character in your text, escape it with another: } }.");
 
                         output.Add(currentChar.ToString());
                         index++;
@@ -322,7 +322,7 @@ namespace GitSvnWrapper
             // We got to the end of the string.
             if (scanningKeyName) throw new Exception(
                 "The character '{' (representing the start of a key name) did not have a matching '}' " +
-                "character. To include the '{' character in your text, escape it with another: {{.");
+                "character. To include the '{' character in your text, escape it with another: { {.");
 
             return output;
         }
