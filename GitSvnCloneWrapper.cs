@@ -74,7 +74,9 @@ namespace GitSvnWrapper
                     {
                         var read = driver.ReadAllOutput();
                         Thread.Sleep(10);
-                        if (string.IsNullOrEmpty(read))
+
+                        // This detects the fact that we didn't receive anything from the console
+                        if (string.IsNullOrEmpty(read) || text == read) 
                             continue;
 
                         text = read;
