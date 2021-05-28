@@ -10,6 +10,8 @@ It's made of a pile of hacks but seems to _kinda_ work. Should be thoroughly tes
 .\gitsvn.ps1 -url https://my.svn.server/svn/project -username foo -password bar -certAcceptResponse t
 ```
 
+One can also pass additional parameters to the underlying git command by using the `-options` argument. If multiple options should be passed, enclose them in quotes.
+
 Remarks:
 
 * Pass `t` to temporarily accept an invalid certificate or `p` to accept it permanently.

@@ -25,13 +25,13 @@ namespace GitSvnWrapper
         public string LastError { get { return lastError; } }
         public int ReturnCode { get { return rc; } } // The return code of the git execution
         private string PowershellExecutablePath { get; set; }
-
-        public int Execute(string url, string username, string password, string certificateAcceptResponse, string options)
+        
+        public int Execute(string url, string username, string password, string certificateAcceptResponse, int timeoutInSeconds)
         {
-            return Execute(url, username, password, certificateAcceptResponse, options, 60);
+            return Execute(url, username, password, certificateAcceptResponse, timeoutInSeconds, null);
         }
 
-        public int Execute(string url, string username, string password, string certificateAcceptResponse, string options, int timeoutInSeconds)
+        public int Execute(string url, string username, string password, string certificateAcceptResponse, int timeoutInSeconds, string options)
         {
             var ok = false;
             try
@@ -53,7 +53,9 @@ namespace GitSvnWrapper
                 var commands = new string[]
                 {
                     string.Format("$marker='{0}'", marker),
-                    string.Format("git svn clone {0} --username {1} {2}", url, username, options),
+                    string.IsNullOrEmpty(options) ?
+                        string.Format("git svn clone {0} --username {1}", url, username) :
+                        string.Format("git svn clone {0} --username {1} {2}", url, username, options),
                     "\"$marker#$LASTEXITCODE#\""
                 };
 
@@ -118,13 +120,6 @@ namespace GitSvnWrapper
             {
                 lastError = ex.ToString();
             }
-
-#if DEBUG
-            // Do not dump on production, because this would leak the password...
-            Console.WriteLine("RC         : " + ReturnCode);
-            Console.WriteLine("LAST ERROR : " + LastError);
-            Console.WriteLine("LAST OUTPUT:\r\n" + LastOutput);
-#endif
 
             return ok ? 0 : -1;
         }
